@@ -11,6 +11,7 @@ import javax.media.opengl.glu.GLU;
  * @author pochemuto
  */
 public class Figure {
+    private static float angle = 0;
     protected static Point[] points = new Point[4];
     protected static Color[] colors = new Color[4];
     static {
@@ -25,35 +26,26 @@ public class Figure {
         colors[3] = Color.PINK;
     }
 
-    protected static void setup( GL2 gl2, int width, int height ) {
-        // Enable smooth shading, which blends colors nicely, and smoothes out lighting.
-        gl2.glShadeModel(GL2.GL_SMOOTH);
-        // Set background color in RGBA. Alpha: 0 (transparent) 1 (opaque)
-        gl2.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        // Setup the depth buffer and enable the depth testing
-        gl2.glClearDepth(1.0f);          // clear z-buffer to the farthest
-        gl2.glEnable(GL.GL_DEPTH_TEST);  // enables depth testing
-        gl2.glDepthFunc(GL.GL_LEQUAL);   // the type of depth test to do
-
-
-        gl2.glMatrixMode( GL2.GL_PROJECTION );
-        gl2.glLoadIdentity();
+    protected static void reshape(GL2 gl, int width, int height) {
+        gl.glMatrixMode( GL2.GL_PROJECTION );
+        gl.glLoadIdentity();
 
         GLU glu = new GLU();
-        glu.gluPerspective(30.0f, width/((float) height), 0.0f, 15.0f);
-        gl2.glMatrixMode(GL2.GL_MODELVIEW);
-        gl2.glViewport(0, 0, width, height);
-        gl2.glLoadIdentity();
-        gl2.glTranslatef(-0.5f, -0.5f, -5f);
+        glu.gluPerspective(30.0f, width/((float) height), 0.1f, 10.0f);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        gl.glViewport(0, 0, width, height);
+
     }
 
     protected static void render( GL2 gl2, int width, int height ) {
         gl2.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl2.glClearColor(1f,1f,1f,1f);
 
-        gl2.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
 
-        gl2.glRotatef(1,0,1,0.3f);
+        gl2.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
+        gl2.glLoadIdentity();
+        gl2.glTranslatef(-0.5f, -0.5f, -5f);
+        gl2.glRotatef(angle++,0,1,0.3f);
         // draw a triangle filling the window
 
         gl2.glBegin(GL.GL_TRIANGLES);
@@ -61,6 +53,7 @@ public class Figure {
         renderTriangle(gl2, 0, 1, 3);
         renderTriangle(gl2, 0, 2, 3);
         renderTriangle(gl2, 1, 2, 3);
+
         gl2.glEnd();
 
     }
@@ -77,6 +70,17 @@ public class Figure {
             gl2.glVertex3fv(f, 0);
         }
 
+    }
+
+    public static void init(GL2 gl2) {
+        // Enable smooth shading, which blends colors nicely, and smoothes out lighting.
+        gl2.glShadeModel(GL2.GL_SMOOTH);
+        // Set background color in RGBA. Alpha: 0 (transparent) 1 (opaque)
+        gl2.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        // Setup the depth buffer and enable the depth testing
+        gl2.glClearDepth(1.0f);          // clear z-buffer to the farthest
+        gl2.glEnable(GL2.GL_DEPTH_TEST);  // enables depth testing
+        gl2.glDepthFunc(GL2.GL_LEQUAL);   // the type of depth test to do
     }
 }
 

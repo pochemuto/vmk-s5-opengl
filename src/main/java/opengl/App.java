@@ -6,9 +6,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 
 import com.jogamp.opengl.util.Animator;
@@ -28,11 +26,7 @@ public class App
     public void start(String[] args) {
         final Frame frame = new Frame();
 
-        GLProfile glprofile = GLProfile.getDefault();
-        GLCapabilities cap = new GLCapabilities( glprofile );
-        cap.setDepthBits(16);
-        final GLCanvas canvas = new GLCanvas( cap );
-
+        final GLCanvas canvas = new GLCanvas( );
         frame.add(canvas);
 
         frame.setSize(300, 300);
@@ -49,7 +43,7 @@ public class App
         canvas.addGLEventListener(new GLEventListener() {
             @Override
             public void init(GLAutoDrawable drawable) {
-
+                Figure.init(drawable.getGL().getGL2());
             }
 
             @Override
@@ -64,7 +58,7 @@ public class App
 
             @Override
             public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-                Figure.setup(drawable.getGL().getGL2(), width, height);
+                Figure.reshape(drawable.getGL().getGL2(), width, height);
             }
         });
 
