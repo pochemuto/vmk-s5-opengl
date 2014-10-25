@@ -136,4 +136,23 @@ public class Mat4 {
     public static Mat4 scale(float factor) {
         return scale(factor, factor, factor);
     }
+
+    public Mat4 mult(Mat4 m) {
+        Mat4 result = new Mat4();
+        float[] a = this.data;
+        float[] b = m.data;
+        float[] c = result.data;
+
+        for (int i = 0; i < 4; i++) {   // строка
+            for (int j = 0; j < 4; j++) {  // столбец
+                float v = 0;
+                for (int k = 0; k < 4; k++) {
+                    v += a[k*4 + i]*b[j*4 + k];
+                }
+                c[j*4 + i] = v;
+            }
+        }
+
+        return result;
+    }
 }

@@ -10,7 +10,6 @@ import com.pochemuto.vmk.opengl.object.Surface;
  */
 public class Meshes {
     public final static Mesh BOX;
-
     public final static Mesh BOX6;
 
     static {
@@ -26,6 +25,9 @@ public class Meshes {
                 1, 1, 1,
                 1, 0, 1,
         };
+        for (int i = 0; i < vertexes.length; i++) {
+            vertexes[i] -= 0.5f;
+        }
         int[] polygons = {
                 0, 1, 2,  // низ
                 0, 2, 3,
@@ -48,6 +50,33 @@ public class Meshes {
             s = new Surface(vertexes, Arrays.copyOfRange(polygons, 6 * i, 6 * (i + 1)));
             BOX6.getSurfaces().add(s);
         }
+    }
 
+    public final static Mesh PYRAMID;
+    static {
+        PYRAMID = new Mesh();
+        float[] vertexes = {
+                0,    0, 0,
+                0,    0, 1,
+                1,    0, 1,
+                1,    0, 0,
+                0.5f, 1, 0.5f
+        };
+
+        for (int i = 0; i < vertexes.length; i++) {
+            vertexes[i] -= 0.5f;
+        }
+
+        int[] polygons = {
+                0, 1, 2,
+                0, 2, 3,
+                0, 1, 4,
+                1, 2, 4,
+                2, 3, 4,
+                3, 0, 4
+        };
+
+        Surface s = new Surface(vertexes, polygons);
+        PYRAMID.getSurfaces().add(s);
     }
 }

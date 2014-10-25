@@ -10,8 +10,9 @@ import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 
 import com.pochemuto.vmk.opengl.material.Material;
-import com.pochemuto.vmk.opengl.object.*;
+import com.pochemuto.vmk.opengl.object.Node;
 import com.pochemuto.vmk.opengl.object.Object;
+import com.pochemuto.vmk.opengl.object.Surface;
 
 /**
  * @author pochemuto
@@ -38,6 +39,8 @@ public class Canvas extends GLCanvas implements GLEventListener {
         gl.glClearDepth(1.0f);
         gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glDepthFunc(GL2.GL_LEQUAL);
+
+//        gl.glEnable(GL2.GL_LIGHTING);
     }
 
     @Override
@@ -47,11 +50,16 @@ public class Canvas extends GLCanvas implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable drawable) {
-
         GL2 gl = drawable.getGL().getGL2();
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
         gl.glLoadIdentity();
+
+        float[] light0_position = { 0,0,0, 1.0f };
+        gl.glEnable(GL2.GL_LIGHT0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, light0_position, 0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, new float[] {1f,0,0,1f}, 0);
+
         gl.glTranslatef(1.6f, 0.0f, -7.0f); // translate right and into the screen
 
         if (world == null) return;
@@ -63,9 +71,6 @@ public class Canvas extends GLCanvas implements GLEventListener {
         for(Node node : world.getNodes()) {
             renderNodeTree(node, gl);
         }
-
-//        renderPyramid(gl);
-
     }
 
     private void renderPyramid(GL2 gl) {
@@ -157,9 +162,6 @@ public class Canvas extends GLCanvas implements GLEventListener {
         gl.glLoadIdentity();
         //TODO камера
         glu.gluPerspective(45.0f, aspect, 0.1f, 100.0f);
-
-//        gl.glMatrixMode(GL2.GL_MODELVIEW);
-//        gl.glLoadIdentity();
     }
 
     public void setUpdater(Updater updater) {
