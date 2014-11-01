@@ -1,5 +1,7 @@
 package com.pochemuto.vmk.opengl;
 
+import java.awt.Color;
+
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -40,7 +42,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glDepthFunc(GL2.GL_LEQUAL);
 
-//        gl.glEnable(GL2.GL_LIGHTING);
+        gl.glEnable(GL2.GL_LIGHTING);
     }
 
     @Override
@@ -55,10 +57,10 @@ public class Canvas extends GLCanvas implements GLEventListener {
         gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
         gl.glLoadIdentity();
 
-        float[] light0_position = { 0,0,0, 1.0f };
+        float[] light0_position = {0, 0, 0, 1.0f};
         gl.glEnable(GL2.GL_LIGHT0);
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, light0_position, 0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, new float[] {1f,0,0,1f}, 0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, Color.WHITE.getComponents(null), 0);
 
         gl.glTranslatef(1.6f, 0.0f, -7.0f); // translate right and into the screen
 
@@ -68,7 +70,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         }
 
         //TODO камера
-        for(Node node : world.getNodes()) {
+        for (Node node : world.getNodes()) {
             renderNodeTree(node, gl);
         }
     }
@@ -136,19 +138,21 @@ public class Canvas extends GLCanvas implements GLEventListener {
             gl.glColor3fv(material.getColor().getComponents(color), 0);
 
             float[] vertexes = surface.getVertexes();
+            float[] normals = surface.getNormals();
             int[] polygons = surface.getPolygons();
 
-            for (int i = 0; i < polygons.length; i+=3) {
-                addVertex(vertexes, polygons[i], gl);
-                addVertex(vertexes, polygons[i+1], gl);
-                addVertex(vertexes, polygons[i+2], gl);
+            for (int i = 0; i < polygons.length; i += 3) {
+                addVertex(vertexes, polygons[i], normals, i, gl);
+                addVertex(vertexes, polygons[i + 1], normals, i + 1, gl);
+                addVertex(vertexes, polygons[i + 2], normals, i + 2, gl);
             }
         }
         gl.glEnd();
     }
 
-    private void addVertex(float[] vertexes, int v, GL2 gl) {
-        gl.glVertex3f(vertexes[3*v], vertexes[3*v+1], vertexes[3*v+2]);
+    private void addVertex(float[] vertexes, int v, float[] normals, int n, GL2 gl) {
+        gl.glNormal3f(normals[3 * n], normals[3 * n + 1], normals[3 * n + 2]);
+        gl.glVertex3f(vertexes[3 * v], vertexes[3 * v + 1], vertexes[3 * v + 2]);
     }
 
     @Override
@@ -156,7 +160,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         GL2 gl = drawable.getGL().getGL2();
 
         height = (height == 0) ? 1 : height;
-        float aspect = (float)width / height;
+        float aspect = (float) width / height;
         gl.glViewport(0, 0, width, height);
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
