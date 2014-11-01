@@ -11,6 +11,7 @@ import com.pochemuto.vmk.opengl.object.Surface;
 public class Meshes {
     public final static Mesh BOX;
     public final static Mesh BOX6;
+    public final static Mesh PLANE;
 
     static {
         BOX = new Mesh();
@@ -29,27 +30,44 @@ public class Meshes {
             vertexes[i] -= 0.5f;
         }
         int[] polygons = {
-                0, 1, 2,  // низ
+                0, 1, 2,  // зад
                 0, 2, 3,
-                4, 5, 6,  // верх
-                4, 6, 7,
-                0, 1, 5,  // право
-                0, 5, 4,
-                2, 3, 7,  // лево
-                2, 7, 6,
-                0, 4, 7,  // перед
-                0, 7, 3,
-                1, 2, 6,  // зад
-                1, 6, 5
+                5, 4, 6,  // перед
+                6, 4, 7,
+                1, 0, 5,  // лево
+                5, 0, 4,
+                3, 2, 7,  // право
+                7, 2, 6,
+                4, 0, 7,  // низ
+                7, 0, 3,
+                2, 1, 6,  // верх
+                6, 1, 5
         };
         Surface s = new Surface(vertexes, polygons);
         BOX.getSurfaces().add(s);
+        System.out.println(Arrays.toString(s.getNormals()));
 
         BOX6 = new Mesh();
-        for (int i = 0; i < polygons.length / 6; i++) {
+        int sides = polygons.length / 6;
+        for (int i = 0; i < sides; i++) {
             s = new Surface(vertexes, Arrays.copyOfRange(polygons, 6 * i, 6 * (i + 1)));
             BOX6.getSurfaces().add(s);
         }
+
+        PLANE = new Mesh();
+
+        vertexes = new float[]{
+                0, 0, 0,
+                1, 0, 0,
+                0, 1, 0,
+                1, 1, 0
+        };
+        polygons = new int[] {
+                0, 1, 2,
+                2, 1, 3
+        };
+        s = new Surface(vertexes, polygons);
+        System.out.println(Arrays.toString(s.getNormals()));
     }
 
     public final static Mesh PYRAMID;
