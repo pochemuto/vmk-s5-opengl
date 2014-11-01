@@ -10,48 +10,55 @@ public class Surface {
     private final float[] normals;
     private final int[] polygons;
 
-    public Surface(float[] vertexes, int[] polygons) {
+    public Surface(float[] vertexes, int[] polygons, float[] normals) {
         if (polygons.length % 3 != 0) {
             throw new IllegalArgumentException("количество точек полигонов должно быть кратно трем");
         }
         if (vertexes.length % 3 != 0) {
             throw new IllegalArgumentException("количество координат вертексов должно быть кратно трем");
         }
+        if (normals.length != polygons.length * 3) {
+            throw new IllegalArgumentException("количество координат нормалей неверно");
+        }
         this.vertexes = vertexes;
         this.polygons = polygons;
-        this.normals = null;
+        this.normals = normals;
     }
 
-    private float[] autoNormals(float[] vertexes, int[] polygons) {
-        float[] normals = new float[polygons.length*3];
+    public Surface(float[] vertexes, int[] polygons) {
+        this(vertexes, polygons, autoNormals(vertexes, polygons));
+    }
 
-        int ni = 0;
+    private static float[] autoNormals(float[] vertexes, int[] polygons) {
+        float[] normals = new float[polygons.length*3];   // на каждый полигон 3 вектора
+
         for (int i = 0; i < polygons.length; i+=3) {
-            Vec3 a = vector(vertexes, i),
-                 b = vector(vertexes, i+1),
-                 c = vector(vertexes, i+2);
+            Vec3 a = vector(vertexes, polygons[i]),
+                 b = vector(vertexes, polygons[i+1]),
+                 c = vector(vertexes, polygons[i+2]);
 
-            Vec3 n =  b.sub(a).mul(c.sub(a));
-            putVector(normals, n, ni);
-            ni += 3;
-            n = a.sub(b).mul(c.sub(b));
-            putVector(normals, n, ni);
-            ni += 3;
-            n = b.sub(c).mul(a.sub(c));
-            putVector(normals, n, ni);
+            Vec3 normal = normal(a, b, c);
+            putNormal(normal, normals, 3*i);
+            putNormal(normal, normals, 3*i+3);
+            putNormal(normal, normals, 3*i+6);
         }
 
         return normals;
     }
 
-    private Vec3 vector(float[] vertexes, int v) {
+    private static Vec3 vector(float[] vertexes, int v) {
         return new Vec3(vertexes[3*v], vertexes[3*v+1], vertexes[3*v+2]);
     }
 
-    private void putVector(float[] target, Vec3 v, int offset) {
-        target[offset++] = v.x();
-        target[offset++] = v.y();
-        target[offset]   = v.z();
+    private static Vec3 normal(Vec3 center, Vec3 left, Vec3 right) {
+        Vec3 l = left.sub(center), r = right.sub(center);
+        return l.mul(r).normalize();
+    }
+
+    private static void putNormal(Vec3 n, float[] target, int offset) {
+        target[offset]   = n.x();
+        target[offset+1] = n.y();
+        target[offset+2] = n.z();
     }
 
     public float[] getVertexes() {
@@ -60,5 +67,9 @@ public class Surface {
 
     public int[] getPolygons() {
         return polygons;
+    }
+
+    public float[] getNormals() {
+        return normals;
     }
 }
