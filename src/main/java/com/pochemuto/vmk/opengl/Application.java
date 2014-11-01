@@ -36,6 +36,7 @@ public class Application {
     private float da = 0.7f;
     private boolean animate = false;
     private long last;
+    private boolean cyclic = false;
 
     public Application() {
         initFrame();
@@ -107,27 +108,27 @@ public class Application {
         Node pivot = new Pivot();
         ObjectNode box = new ObjectNode(Meshes.BOX6);
         box.setName("Box");
+//        box.setMaterial(solidMaterial(Color.RED),   0);
+//        box.setMaterial(solidMaterial(Color.GREEN), 1);
+//        box.setMaterial(solidMaterial(Color.BLUE),  2);
+//        box.setMaterial(solidMaterial(Color.GRAY),  3);
+//        box.setMaterial(solidMaterial(Color.BLACK), 4);
+//        box.setMaterial(solidMaterial(Color.CYAN),  5);
 
-        ObjectNode boxSmall = new ObjectNode(Meshes.PYRAMID);
-        boxSmall.setMaterial(solidMaterial(Color.GREEN), 0);
-        boxSmall.setTransform(Mat4.translate(0, 1f, 0).mult(Mat4.scale(1.4f, 1f, 1.4f)));
+        ObjectNode roof = new ObjectNode(Meshes.PYRAMID);
+        roof.setMaterial(solidMaterial(Color.GREEN), 0);
+        roof.setTransform(Mat4.translate(0, 1f, 0).mult(Mat4.scale(1.4f, 1f, 1.4f)));
 
         ObjectNode table = new ObjectNode(Meshes.BOX);
-        table.setMaterial(solidMaterial(new Color(4, 72, 2)), 0);
+        table.setMaterial(solidMaterial(new Color(1,1,1)), 0);
         table.setTransform(Mat4.translate(0, -2, 0).mult(Mat4.scale(7,1,7)));
 
-        box.setMaterial(solidMaterial(Color.RED),   0);
-        box.setMaterial(solidMaterial(Color.GREEN), 1);
-        box.setMaterial(solidMaterial(Color.BLUE),  2);
-        box.setMaterial(solidMaterial(Color.GRAY),  3);
-        box.setMaterial(solidMaterial(Color.BLACK), 4);
-        box.setMaterial(solidMaterial(Color.CYAN),  5);
 
         Node p = new Pivot();
         p.setTransform(Mat4.rotateX(25f).mult(Mat4.translate(-2,0,0)));
 
         pivot.addChild(box);
-        pivot.addChild(boxSmall);
+//        pivot.addChild(roof);
 
         p.addChild(pivot);
         p.addChild(table);
@@ -146,9 +147,9 @@ public class Application {
             pivot.setTransform(Mat4.rotateX(angleX).mult(Mat4.rotateY(angleY)));
             // циклическое обновление материалов
             long time = new Date().getTime();
-            if (time - last >= 2000) {
+            if (cyclic && time - last >= 2000) {
                 last = time;
-                boxSmall.setMaterial(randomMaterial(), 0);
+                roof.setMaterial(randomMaterial(), 0);
                 Material m = box.getMaterial(0);
                 int surfaceLastIdx = box.getSurfaces().size() - 1;
                 for (int i = 0; i < surfaceLastIdx; i++) {
