@@ -107,6 +107,7 @@ public class Application {
         // наполняем мир
         Node pivot = new Pivot();
         ObjectNode box = new ObjectNode(Meshes.BOX6);
+        box.setTransform(Mat4.scale(1,0.8f,1));
         box.setName("Box");
 //        box.setMaterial(solidMaterial(Color.RED),   0);
 //        box.setMaterial(solidMaterial(Color.GREEN), 1);
@@ -117,7 +118,7 @@ public class Application {
 
         ObjectNode roof = new ObjectNode(Meshes.PYRAMID);
         roof.setMaterial(solidMaterial(Color.GREEN), 0);
-        roof.setTransform(Mat4.translate(0, 1f, 0).mult(Mat4.scale(1.4f, 1f, 1.4f)));
+        roof.setTransform(Mat4.translate(0, 0.8f, 0).mult(Mat4.scale(1.4f, 0.8f, 1.4f)));
 
         ObjectNode table = new ObjectNode(Meshes.BOX);
         table.setMaterial(solidMaterial(new Color(1,1,1)), 0);
@@ -128,7 +129,7 @@ public class Application {
         p.setTransform(Mat4.rotateX(25f).mult(Mat4.translate(-2,0,0)));
 
         pivot.addChild(box);
-//        pivot.addChild(roof);
+        pivot.addChild(roof);
 
         p.addChild(pivot);
         p.addChild(table);
