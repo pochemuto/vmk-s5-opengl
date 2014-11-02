@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 
 import com.jogamp.opengl.util.FPSAnimator;
 import com.pochemuto.vmk.opengl.core.Mat4;
+import com.pochemuto.vmk.opengl.light.Sun;
 import com.pochemuto.vmk.opengl.material.Material;
 import com.pochemuto.vmk.opengl.node.Pivot;
 import com.pochemuto.vmk.opengl.object.Node;
@@ -107,33 +108,37 @@ public class Application {
         // наполняем мир
         Node pivot = new Pivot();
         ObjectNode box = new ObjectNode(Meshes.BOX6);
-        box.setTransform(Mat4.scale(1,0.8f,1));
+        box.setTransform(Mat4.scale(1, 0.8f, 1));
         box.setName("Box");
-//        box.setMaterial(solidMaterial(Color.RED),   0);
-//        box.setMaterial(solidMaterial(Color.GREEN), 1);
-//        box.setMaterial(solidMaterial(Color.BLUE),  2);
-//        box.setMaterial(solidMaterial(Color.GRAY),  3);
-//        box.setMaterial(solidMaterial(Color.BLACK), 4);
-//        box.setMaterial(solidMaterial(Color.CYAN),  5);
+        box.setMaterial(solidMaterial(Color.RED),   0);
+        box.setMaterial(solidMaterial(Color.GREEN), 1);
+        box.setMaterial(solidMaterial(Color.BLUE),  2);
+        box.setMaterial(solidMaterial(Color.GRAY),  3);
+        box.setMaterial(solidMaterial(Color.PINK), 4);
+        box.setMaterial(solidMaterial(Color.CYAN),  5);
 
         ObjectNode roof = new ObjectNode(Meshes.PYRAMID);
         roof.setMaterial(solidMaterial(Color.GREEN), 0);
         roof.setTransform(Mat4.translate(0, 0.8f, 0).mult(Mat4.scale(1.4f, 0.8f, 1.4f)));
 
         ObjectNode table = new ObjectNode(Meshes.BOX);
-        table.setMaterial(solidMaterial(new Color(1,1,1)), 0);
+        table.setMaterial(solidMaterial(new Color(0, 206, 206)), 0);
         table.setTransform(Mat4.translate(0, -2, 0).mult(Mat4.scale(7,1,7)));
 
-
         Node p = new Pivot();
-        p.setTransform(Mat4.rotateX(25f).mult(Mat4.translate(-2,0,0)));
+        p.setTransform(Mat4.rotateX(25f).mult(Mat4.translate(-2, 0, 0)));
 
         pivot.addChild(box);
         pivot.addChild(roof);
 
         p.addChild(pivot);
         p.addChild(table);
+
+        // свет
+        Sun sun = new Sun();
+        sun.setTransform(Mat4.rotateY(30));
         world.getNodes().add(p);
+        world.getNodes().add(sun);
 
         // обновление мира
         canvas.setUpdater(w -> {
@@ -173,6 +178,7 @@ public class Application {
     private Material solidMaterial(Color c) {
         Material m = new Material();
         m.setColor(c);
+        m.setDiffuse(c);
         return m;
     }
 

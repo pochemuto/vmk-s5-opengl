@@ -8,11 +8,21 @@ import java.awt.Color;
 public class Material {
     private Color color = Color.BLACK;
 
+    private Color diffuse = Color.WHITE;
+
     public Color getColor() {
         return color;
     }
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public Color getDiffuse() {
+        return diffuse;
+    }
+
+    public void setDiffuse(Color diffuse) {
+        this.diffuse = diffuse;
     }
 }
