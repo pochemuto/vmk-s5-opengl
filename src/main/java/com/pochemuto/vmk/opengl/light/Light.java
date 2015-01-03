@@ -1,12 +1,14 @@
 package com.pochemuto.vmk.opengl.light;
 
-import java.awt.Color;
-
 import com.pochemuto.vmk.opengl.node.BaseNode;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import java.awt.*;
 
 /**
  * @author pochemuto
  */
+@XmlRootElement
 public abstract class Light extends BaseNode {
     private Color diffuse = Color.BLACK;
     private Color specular = Color.BLACK;

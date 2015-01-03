@@ -1,9 +1,9 @@
 package com.pochemuto.vmk.opengl.samples;
 
-import java.util.Arrays;
-
 import com.pochemuto.vmk.opengl.object.Mesh;
 import com.pochemuto.vmk.opengl.object.Surface;
+
+import java.util.Arrays;
 
 /**
  * @author pochemuto
@@ -45,12 +45,21 @@ public class Meshes {
         };
         Surface s = new Surface(vertexes, polygons);
         BOX.getSurfaces().add(s);
-        System.out.println(Arrays.toString(s.getNormals()));
 
+        // текстурные координаты одной стороны кубика
+        float[] sideCoord = {
+                0, 0,
+                1, 1,
+                0, 1,
+                0, 0,
+                1, 1,
+                1, 0
+        };
         BOX6 = new Mesh();
         int sides = polygons.length / 6;
         for (int i = 0; i < sides; i++) {
             s = new Surface(vertexes, Arrays.copyOfRange(polygons, 6 * i, 6 * (i + 1)));
+            s.setTexcoords(sideCoord);
             BOX6.getSurfaces().add(s);
         }
 

@@ -1,20 +1,28 @@
 package com.pochemuto.vmk.opengl.object;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.pochemuto.vmk.opengl.material.Material;
 import com.pochemuto.vmk.opengl.material.Materials;
 import com.pochemuto.vmk.opengl.node.BaseNode;
 
+import javax.xml.bind.annotation.*;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author pochemuto
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ObjectNode extends BaseNode implements Object {
 
-    private final Material[] materials;
+    @XmlElementWrapper
+    private Material[] materials;
 
-    private final Mesh mesh;
+    @XmlElement
+    private Mesh mesh;
+
+    public ObjectNode() {
+    }
 
     public ObjectNode(Mesh mesh) {
         this.mesh = mesh;

@@ -1,14 +1,25 @@
 package com.pochemuto.vmk.opengl.object;
 
 import com.pochemuto.vmk.opengl.core.Vec3;
+import com.pochemuto.vmk.opengl.core.xml.SurfaceAdapter;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author pochemuto
  */
+@XmlRootElement
+@XmlJavaTypeAdapter(SurfaceAdapter.class)
 public class Surface {
+
     private final float[] vertexes;
+
     private final float[] normals;
+
     private final int[] polygons;
+
+    private float[] texcoords;
 
     public Surface(float[] vertexes, int[] polygons, float[] normals) {
         if (polygons.length % 3 != 0) {
@@ -71,5 +82,16 @@ public class Surface {
 
     public float[] getNormals() {
         return normals;
+    }
+
+    public float[] getTexcoords() {
+        return texcoords;
+    }
+
+    public void setTexcoords(float[] texcoords) {
+        if (texcoords.length != polygons.length * 2) {
+            throw new IllegalArgumentException("текстурных координат должно быть по две на каждый вертекс");
+        }
+        this.texcoords = texcoords;
     }
 }

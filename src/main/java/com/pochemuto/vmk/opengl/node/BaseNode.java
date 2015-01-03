@@ -1,16 +1,19 @@
 package com.pochemuto.vmk.opengl.node;
 
+import com.pochemuto.vmk.opengl.core.Mat4;
+import com.pochemuto.vmk.opengl.object.Node;
+import com.pochemuto.vmk.opengl.object.ObjectNode;
+
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.pochemuto.vmk.opengl.core.Mat4;
-
-import com.pochemuto.vmk.opengl.object.Node;
 
 /**
  * @author pochemuto
  */
-public class BaseNode implements Node {
+@XmlType(propOrder = {"name", "transform", "children"})
+@XmlSeeAlso({ObjectNode.class})
+public abstract class BaseNode implements Node {
     private final List<Node> children = new ArrayList<>();
 
     private Mat4 transform = Mat4.IDENTITY;
@@ -20,6 +23,7 @@ public class BaseNode implements Node {
     private String name;
 
     @Override
+    @XmlAttribute
     public String getName() {
         return name;
     }
@@ -35,6 +39,7 @@ public class BaseNode implements Node {
     }
 
     @Override
+    @XmlTransient
     public Node getParent() {
         return parent;
     }
@@ -45,6 +50,8 @@ public class BaseNode implements Node {
     }
 
     @Override
+    @XmlElementWrapper
+    @XmlAnyElement
     public List<Node> getChildren() {
         return children;
     }

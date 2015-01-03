@@ -1,23 +1,21 @@
 package com.pochemuto.vmk.opengl;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.Date;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import com.jogamp.opengl.util.FPSAnimator;
 import com.pochemuto.vmk.opengl.core.Mat4;
-import com.pochemuto.vmk.opengl.light.Sun;
+import com.pochemuto.vmk.opengl.light.Spot;
 import com.pochemuto.vmk.opengl.material.Material;
 import com.pochemuto.vmk.opengl.node.Pivot;
 import com.pochemuto.vmk.opengl.object.Node;
 import com.pochemuto.vmk.opengl.object.ObjectNode;
 import com.pochemuto.vmk.opengl.samples.Meshes;
+
+import javax.swing.*;
+import javax.xml.bind.JAXBException;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Date;
 
 /**
  * @author pochemuto
@@ -42,6 +40,37 @@ public class Application {
     public Application() {
         initFrame();
         initWorld();
+        initDynamic();
+    }
+
+    private void initDynamic() {
+        Node pivot = world.getNodeByName("pivot");
+        com.pochemuto.vmk.opengl.object.Object box = (com.pochemuto.vmk.opengl.object.Object) world.getNodeByName("box");
+
+        // обновление мира
+        canvas.setUpdater(w -> {
+            // вращение
+            if (!drag && angleYSpeed > EPS) {
+                angleY += angleYSpeed;
+                angleYSpeed *= g;
+            }
+            if (animate) {
+                angleY += da;
+            }
+            pivot.setTransform(Mat4.rotateX(angleX).mult(Mat4.rotateY(angleY)));
+            // циклическое обновление материалов
+            long time = new Date().getTime();
+            if (cyclic && time - last >= 2000) {
+                last = time;
+//                roof.setMaterial(randomMaterial(), 0);
+                Material m = box.getMaterial(0);
+                int surfaceLastIdx = box.getSurfaces().size() - 1;
+                for (int i = 0; i < surfaceLastIdx; i++) {
+                    box.setMaterial(box.getMaterial(i+1), i);
+                }
+                box.setMaterial(m, surfaceLastIdx);
+            }
+        });
     }
 
     private void initFrame() {
@@ -107,15 +136,18 @@ public class Application {
     private void initWorld() {
         // наполняем мир
         Node pivot = new Pivot();
+        pivot.setName("pivot");
         ObjectNode box = new ObjectNode(Meshes.BOX6);
+        Material sideMaterial = new Material();
+        sideMaterial.setTexture(Application.class.getResource("/bricks.png"));
         box.setTransform(Mat4.scale(1, 0.8f, 1));
-        box.setName("Box");
-        box.setMaterial(solidMaterial(Color.RED),   0);
-        box.setMaterial(solidMaterial(Color.GREEN), 1);
-        box.setMaterial(solidMaterial(Color.BLUE),  2);
-        box.setMaterial(solidMaterial(Color.GRAY),  3);
-        box.setMaterial(solidMaterial(Color.PINK), 4);
-        box.setMaterial(solidMaterial(Color.CYAN),  5);
+        box.setName("box");
+        box.setMaterial(sideMaterial, 0);
+        box.setMaterial(sideMaterial, 1);
+        box.setMaterial(sideMaterial, 2);
+        box.setMaterial(sideMaterial, 3);
+        box.setMaterial(sideMaterial, 4);
+        box.setMaterial(sideMaterial, 5);
 
         ObjectNode roof = new ObjectNode(Meshes.PYRAMID);
         roof.setMaterial(solidMaterial(Color.GREEN), 0);
@@ -135,35 +167,17 @@ public class Application {
         p.addChild(table);
 
         // свет
-        Sun sun = new Sun();
-        sun.setTransform(Mat4.rotateY(30));
-        world.getNodes().add(p);
-        world.getNodes().add(sun);
+        Spot light = new Spot();
+        light.setConstantAttenuation(0);
+        light.setLinearAttenuation(0.2f);
+        light.setQuadraticAttenuation(0.4f);
+        light.setDiffuse(new Color(223, 219, 255));
 
-        // обновление мира
-        canvas.setUpdater(w -> {
-            // вращение
-            if (!drag && angleYSpeed > EPS) {
-                angleY += angleYSpeed;
-                angleYSpeed *= g;
-            }
-            if (animate) {
-                angleY += da;
-            }
-            pivot.setTransform(Mat4.rotateX(angleX).mult(Mat4.rotateY(angleY)));
-            // циклическое обновление материалов
-            long time = new Date().getTime();
-            if (cyclic && time - last >= 2000) {
-                last = time;
-                roof.setMaterial(randomMaterial(), 0);
-                Material m = box.getMaterial(0);
-                int surfaceLastIdx = box.getSurfaces().size() - 1;
-                for (int i = 0; i < surfaceLastIdx; i++) {
-                    box.setMaterial(box.getMaterial(i+1), i);
-                }
-                box.setMaterial(m, surfaceLastIdx);
-            }
-        });
+        light.setTransform(Mat4.rotateY(30));
+
+        world.getNodes().add(light);
+        world.getNodes().add(p);
+
     }
 
     private Material randomMaterial() {
@@ -182,7 +196,7 @@ public class Application {
         return m;
     }
 
-    public static void main(String... args) {
+    public static void main(String... args) throws JAXBException {
         Application app = new Application();
         app.start();
     }

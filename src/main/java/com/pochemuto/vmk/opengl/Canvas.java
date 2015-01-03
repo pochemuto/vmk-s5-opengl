@@ -1,22 +1,23 @@
 package com.pochemuto.vmk.opengl;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLException;
-import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.fixedfunc.GLMatrixFunc;
-import javax.media.opengl.glu.GLU;
-
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureIO;
 import com.pochemuto.vmk.opengl.core.Vec3;
 import com.pochemuto.vmk.opengl.light.Light;
-import com.pochemuto.vmk.opengl.light.Projector;
+import com.pochemuto.vmk.opengl.light.PointLight;
 import com.pochemuto.vmk.opengl.light.Spot;
+import com.pochemuto.vmk.opengl.light.Sun;
 import com.pochemuto.vmk.opengl.material.Material;
 import com.pochemuto.vmk.opengl.object.Node;
 import com.pochemuto.vmk.opengl.object.Object;
 import com.pochemuto.vmk.opengl.object.Surface;
+
+import javax.media.opengl.*;
+import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.fixedfunc.GLMatrixFunc;
+import javax.media.opengl.glu.GLU;
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * @author pochemuto
@@ -136,26 +137,32 @@ public class Canvas extends GLCanvas implements GLEventListener {
 
     private void renderLight(Light light, GL2 gl) {
         float[] color = new float[4];
-        int lightNum = GL2.GL_LIGHT0 + lights;
+        int lightNum = GL2.GL_LIGHT1 + lights;
+        if (light instanceof Sun) {
+            lightNum = 0;
+        }
+
         gl.glEnable(lightNum);
-        gl.glLightfv(lightNum, GL2.GL_POSITION, new float[] {0,0,1,0}, 0);
+
+        gl.glLightfv(lightNum, GL2.GL_POSITION, new float[]{0, 0, 1, 0}, 0);
         gl.glLightfv(lightNum, GL2.GL_DIFFUSE, light.getDiffuse().getComponents(color), 0);
         gl.glLightfv(lightNum, GL2.GL_SPECULAR, light.getSpecular().getComponents(color), 0);
         gl.glLightfv(lightNum, GL2.GL_AMBIENT, light.getAmbient().getComponents(color), 0);
 
-        if (light instanceof Spot) {
-            Spot spot = (Spot) light;
-            gl.glLightf(lightNum, GL2.GL_CONSTANT_ATTENUATION, spot.getConstantAttenuation());
-            gl.glLightf(lightNum, GL2.GL_LINEAR_ATTENUATION, spot.getConstantAttenuation());
-            gl.glLightf(lightNum, GL2.GL_QUADRATIC_ATTENUATION, spot.getQuadraticAttenuation());
+        if (light instanceof PointLight) {
+            PointLight pointLight = (PointLight) light;
+            gl.glLightf(lightNum, GL2.GL_CONSTANT_ATTENUATION, pointLight.getConstantAttenuation());
+            gl.glLightf(lightNum, GL2.GL_LINEAR_ATTENUATION, pointLight.getLinearAttenuation());
+            gl.glLightf(lightNum, GL2.GL_QUADRATIC_ATTENUATION, pointLight.getQuadraticAttenuation());
 
-            if (spot instanceof Projector) {
-                Projector proj = (Projector) spot;
-                gl.glLightfv(lightNum, GL2.GL_SPOT_DIRECTION, vec3Array(proj.getDirection()), 0);
-                gl.glLightf(lightNum, GL2.GL_SPOT_CUTOFF, proj.getCutoff());
-                gl.glLightf(lightNum, GL2.GL_SPOT_EXPONENT, proj.getExponent());
+            if (pointLight instanceof Spot) {
+                Spot spot = (Spot) pointLight;
+                gl.glLightfv(lightNum, GL2.GL_SPOT_DIRECTION, vec3Array(spot.getDirection()), 0);
+                gl.glLightf(lightNum, GL2.GL_SPOT_CUTOFF, spot.getCutoff());
+                gl.glLightf(lightNum, GL2.GL_SPOT_EXPONENT, spot.getExponent());
             }
         }
+
     }
 
     private static float[] vec3Array(Vec3 vec) {
@@ -173,22 +180,43 @@ public class Canvas extends GLCanvas implements GLEventListener {
             gl.glColor3fv(material.getColor().getComponents(color), 0);
             gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, material.getDiffuse().getComponents(color), 0);
 
+            float[] texcoords = surface.getTexcoords();
+            URL textureFile = material.getTexture();
+            try {
+                if (textureFile != null && texcoords != null) {
+                    Texture texture = TextureIO.newTexture(textureFile, true, null);
+                    texture.bind(gl);
+                    texture.enable(gl);
+                    gl.glEnable(GL.GL_TEXTURE_2D);
+                    System.out.println("загружена текстура " + textureFile + " (" + texture.getImageWidth() + "x" + texture.getImageHeight());
+                }
+            } catch (IOException|GLException e) {
+                System.err.println("ошибка при загрузке текстуры " + textureFile);
+                e.printStackTrace();
+            }
+
+
             float[] vertexes = surface.getVertexes();
             float[] normals = surface.getNormals();
             int[] polygons = surface.getPolygons();
 
             for (int i = 0; i < polygons.length; i += 3) {
-                addVertex(vertexes, polygons[i], normals, i, gl);
-                addVertex(vertexes, polygons[i + 1], normals, i + 1, gl);
-                addVertex(vertexes, polygons[i + 2], normals, i + 2, gl);
+                addVertex(vertexes, polygons[i], normals, texcoords, i, gl);
+                addVertex(vertexes, polygons[i + 1], normals, texcoords, i + 1, gl);
+                addVertex(vertexes, polygons[i + 2], normals, texcoords, i + 2, gl);
             }
+
+            gl.glDisable(GL2.GL_TEXTURE_2D);
         }
         gl.glEnd();
     }
 
-    private void addVertex(float[] vertexes, int v, float[] normals, int n, GL2 gl) {
-        gl.glNormal3f(normals[3 * n], normals[3 * n + 1], normals[3 * n + 2]);
-        gl.glVertex3f(vertexes[3 * v], vertexes[3 * v + 1], vertexes[3 * v + 2]);
+    private void addVertex(float[] vertexes, int v, float[] normals, float[] texcoords, int n, GL2 gl) {
+        gl.glNormal3fv(normals, 3 * n);
+        if (texcoords != null) {
+            gl.glTexCoord2fv(texcoords, 2 * n);
+        }
+        gl.glVertex3fv(vertexes, 3 * v);
     }
 
     @Override

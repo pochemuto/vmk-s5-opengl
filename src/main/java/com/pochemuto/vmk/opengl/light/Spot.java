@@ -1,40 +1,47 @@
 package com.pochemuto.vmk.opengl.light;
 
-import com.pochemuto.vmk.opengl.core.Mat4;
+import com.pochemuto.vmk.opengl.core.Vec3;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author pochemuto
  */
-public class Spot extends Light {
-    private float constantAttenuation = 1f;
-    private float linearAttenuation;
-    private float quadraticAttenuation;
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Spot extends PointLight {
+    public Vec3 direction = new Vec3(0,0,-1);
+    public float cutoff = 180.0f;
+    public float exponent;
 
-    public Spot() {
-        setTransform(Mat4.translate(0,0,1));
+    public Vec3 getDirection() {
+        return direction;
     }
 
-    public float getConstantAttenuation() {
-        return constantAttenuation;
+    public void setDirection(Vec3 direction) {
+        this.direction = direction;
     }
 
-    public void setConstantAttenuation(float constantAttenuation) {
-        this.constantAttenuation = constantAttenuation;
+    public float getCutoff() {
+        return cutoff;
     }
 
-    public float getLinearAttenuation() {
-        return linearAttenuation;
+    public void setCutoff(float cutoff) {
+        this.cutoff = cutoff;
     }
 
-    public void setLinearAttenuation(float linearAttenuation) {
-        this.linearAttenuation = linearAttenuation;
+    public float getExponent() {
+        return exponent;
     }
 
-    public float getQuadraticAttenuation() {
-        return quadraticAttenuation;
+    public void setExponent(float exponent) {
+        this.exponent = exponent;
     }
 
-    public void setQuadraticAttenuation(float quadraticAttenuation) {
-        this.quadraticAttenuation = quadraticAttenuation;
+    public static void main(String... args) {
+        Thread t = new Thread();
+        t.interrupt();
     }
 }

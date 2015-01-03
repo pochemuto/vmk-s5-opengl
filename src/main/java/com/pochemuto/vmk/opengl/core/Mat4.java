@@ -1,18 +1,33 @@
 package com.pochemuto.vmk.opengl.core;
 
+import com.pochemuto.vmk.opengl.core.xml.Mat4Adapter;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Arrays;
 
 /**
  * @author pochemuto
  */
+@XmlJavaTypeAdapter(Mat4Adapter.class)
 public class Mat4 {
-    private final float[] data = new float[16];
+
+    @XmlElement
+    private final float[] data;
 
     public Mat4() {
+        data = new float[16];
         data[0] = 1;
         data[5] = 1;
         data[10] = 1;
         data[15] = 1;
+    }
+
+    public Mat4(float[] data) {
+        if (data.length != 16) {
+            throw new IllegalArgumentException("количество значений в матрице не равно 16");
+        }
+        this.data = data;
     }
 
     public float[] getData() {

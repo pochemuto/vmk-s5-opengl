@@ -1,10 +1,14 @@
 package com.pochemuto.vmk.opengl.core;
 
+import com.pochemuto.vmk.opengl.core.xml.Vec3Adapter;
+
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Arrays;
 
 /**
  * @author pochemuto
  */
+@XmlJavaTypeAdapter(Vec3Adapter.class)
 public class Vec3 {
     private final float[] data;
 
@@ -15,6 +19,8 @@ public class Vec3 {
     public Vec3(float x, float y, float z) {
         data = new float[]{x, y, z};
     }
+
+    public static final Vec3 ZERO = new Vec3(0, 0, 0);
 
     public Vec3 add(Vec3 v) {
         float[] r = new float[data.length];

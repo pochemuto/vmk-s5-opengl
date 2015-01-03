@@ -1,14 +1,19 @@
 package com.pochemuto.vmk.opengl.material;
 
-import java.awt.Color;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.awt.*;
+import java.net.URL;
 
 /**
  * @author pochemuto
  */
+@XmlRootElement
 public class Material {
     private Color color = Color.BLACK;
 
     private Color diffuse = Color.WHITE;
+
+    private URL texture;
 
     public Color getColor() {
         return color;
@@ -24,5 +29,13 @@ public class Material {
 
     public void setDiffuse(Color diffuse) {
         this.diffuse = diffuse;
+    }
+
+    public URL getTexture() {
+        return texture;
+    }
+
+    public void setTexture(URL texture) {
+        this.texture = texture;
     }
 }

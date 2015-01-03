@@ -1,12 +1,14 @@
 package com.pochemuto.vmk.opengl.object;
 
-import java.util.List;
-
 import com.pochemuto.vmk.opengl.core.Mat4;
+
+import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 /**
  * @author pochemuto
  */
+@XmlType(propOrder = {"name", "transform", "children"})
 public interface Node {
     String getName();
 
