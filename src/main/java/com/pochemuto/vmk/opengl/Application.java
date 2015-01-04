@@ -101,18 +101,23 @@ public class Application {
         });
 
         Manipulator m =new Manipulator() {
+            private boolean lockY = false;
+
             @Override
             void drag(int dx, int dy) {
-                angleY += dx;
+                if (!lockY) {
+                    angleY += dx;
+                    angleYSpeed = dx;
+                }
                 angleX += dy;
-                angleYSpeed = dx;
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
                 drag = true;
-                animate = false;
+                animate = e.getButton() != MouseEvent.BUTTON1 && animate;
+                lockY = animate;
             }
 
             @Override
