@@ -18,6 +18,7 @@ import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,10 +59,10 @@ public class Canvas extends GLCanvas implements GLEventListener {
                     String texFile = material.getTexture();
                     if (texFile != null && !textures.containsKey(texFile)) {
                         try {
-                            Texture texture = TextureIO.newTexture(new File("/Users/pochemuto/Documents/workspace/opengl/src/main/resources/bricks.png"), true);
+                            Texture texture = TextureIO.newTexture(new File(Canvas.class.getResource(texFile).toURI()), true);
                             textures.put(texFile, texture);
                             System.out.println("loaded " + texFile);
-                        } catch (IOException e) {
+                        } catch (IOException | URISyntaxException e) {
                             e.printStackTrace();
                         }
                     }
@@ -205,9 +206,10 @@ public class Canvas extends GLCanvas implements GLEventListener {
 
             float[] texcoords = surface.getTexcoords();
             String textureFile = material.getTexture();
+            Texture texture = null;
             try {
                 if (textureFile != null && texcoords != null) {
-                    Texture texture = textures.get(textureFile);
+                    texture = textures.get(textureFile);
                     if (texture == null) {
                         System.err.println("текстура " + textureFile + " не загружена");
                     } else {
@@ -233,6 +235,9 @@ public class Canvas extends GLCanvas implements GLEventListener {
             }
 
             gl.glDisable(GL2.GL_TEXTURE_2D);
+            if (texture != null) {
+                texture.disable(gl);
+            }
             gl.glEnd();
         }
     }

@@ -95,15 +95,42 @@ public class Meshes {
         }
 
         int[] polygons = {
-                1, 0, 2,  // основание
-                2, 0, 3,
+                0, 3, 2,  // основание
+                0, 2, 1,
                 0, 1, 4,
                 1, 2, 4,
                 2, 3, 4,
                 3, 0, 4
         };
 
+        float[] tex = {
+                // A
+                0, 0,
+                0, 0.5f,
+                0.5f, 0.5f,
+                0, 0,
+                0.5f, 0.5f,
+                0.5f, 0,
+                // B
+                0.5f, 0,
+                1, 0,
+                0.75f, 0.5f,
+                // C
+                0, 0.5f,
+                0.5f, 0.5f,
+                0.25f, 1,
+                // D
+                0.5f, 0.5f,
+                1, 0.5f,
+                0.75f, 1,
+                // E
+                0.75f, 1,
+                0.25f, 1,
+                0.5f, 0.5f
+        };
+
         Surface s = new Surface(vertexes, polygons);
+        s.setTexcoords(tex);
         PYRAMID.getSurfaces().add(s);
     }
 }

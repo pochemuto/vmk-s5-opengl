@@ -139,7 +139,7 @@ public class Application {
         pivot.setName("pivot");
         ObjectNode box = new ObjectNode(Meshes.BOX6);
         Material sideMaterial = new Material();
-        sideMaterial.setTexture("/bricks.tga");
+        sideMaterial.setTexture("/textures/bricks.png");
         box.setTransform(Mat4.scale(1, 0.8f, 1));
         box.setName("box");
         box.setMaterial(sideMaterial, 0);
@@ -150,7 +150,9 @@ public class Application {
         box.setMaterial(sideMaterial, 5);
 
         ObjectNode roof = new ObjectNode(Meshes.PYRAMID);
-        roof.setMaterial(solidMaterial(Color.GREEN), 0);
+        Material roofMaterial = new Material();
+        roofMaterial.setTexture("/textures/pyramid.png");
+        roof.setMaterial(roofMaterial, 0);
         roof.setTransform(Mat4.translate(0, 0.8f, 0).mult(Mat4.scale(1.4f, 0.8f, 1.4f)));
 
         ObjectNode table = new ObjectNode(Meshes.BOX);
