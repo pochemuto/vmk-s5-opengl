@@ -1,6 +1,5 @@
 package com.pochemuto.vmk.opengl;
 
-import com.jogamp.opengl.util.FPSAnimator;
 import com.pochemuto.vmk.opengl.core.Mat4;
 import com.pochemuto.vmk.opengl.light.Spot;
 import com.pochemuto.vmk.opengl.material.Material;
@@ -23,7 +22,6 @@ import java.util.Date;
 public class Application {
     private Canvas canvas;
     private World world;
-    private FPSAnimator animator;
     private JFrame frame;
 
     private boolean drag = false;
@@ -48,14 +46,15 @@ public class Application {
         com.pochemuto.vmk.opengl.object.Object box = (com.pochemuto.vmk.opengl.object.Object) world.getNodeByName("box");
 
         // обновление мира
-        canvas.setUpdater(w -> {
+        canvas.setUpdater((w, ftime) -> {
+            double ft = 60 / ftime;
             // вращение
             if (!drag && angleYSpeed > EPS) {
-                angleY += angleYSpeed;
-                angleYSpeed *= g;
+                angleY += angleYSpeed * ft;
+                angleYSpeed *= g * ft;
             }
             if (animate) {
-                angleY += da;
+                angleY += da * ft;
             }
             pivot.setTransform(Mat4.rotateX(angleX).mult(Mat4.rotateY(angleY)));
             // циклическое обновление материалов
@@ -81,7 +80,6 @@ public class Application {
         final int WINDOW_WIDTH = 800;
         final int WINDOW_HEIGHT = 600;
 
-        animator = new FPSAnimator(canvas, 60, true);
         frame = new JFrame("OpenGL Java Rocks!");
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(canvas, BorderLayout.CENTER);
@@ -95,7 +93,7 @@ public class Application {
                 new Thread() {
                     @Override
                     public void run() {
-                        animator.stop(); // stop the animator loop
+                        canvas.stop(); // stop the animator loop
                         System.exit(0);
                     }
                 }.start();
@@ -205,6 +203,6 @@ public class Application {
 
     private void start() {
         frame.setVisible(true);
-        animator.start();
+        canvas.start();
     }
 }

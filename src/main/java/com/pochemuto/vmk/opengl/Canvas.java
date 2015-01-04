@@ -1,5 +1,6 @@
 package com.pochemuto.vmk.opengl;
 
+import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 import com.pochemuto.vmk.opengl.core.Vec3;
@@ -29,11 +30,14 @@ public class Canvas extends GLCanvas implements GLEventListener {
     private World world;
     private GLU glu;
     private Updater updater;
+    private FPSAnimator animator;
     private int lights = 0;
     private final Map<String, Texture> textures = new HashMap<>();
 
     public Canvas() throws GLException {
         addGLEventListener(this);
+        animator = new FPSAnimator(this, 60, true);
+        animator.setUpdateFPSFrames(3, null);
     }
 
     public void setWorld(World world) {
@@ -92,7 +96,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
 
         if (world == null) return;
         if (updater != null) {
-            updater.update(world);
+            updater.update(world, animator.getLastFPS());
         }
 
         //TODO камера
@@ -265,5 +269,13 @@ public class Canvas extends GLCanvas implements GLEventListener {
 
     public void setUpdater(Updater updater) {
         this.updater = updater;
+    }
+
+    public void stop() {
+        animator.stop();
+    }
+
+    public void start() {
+        animator.start();
     }
 }
