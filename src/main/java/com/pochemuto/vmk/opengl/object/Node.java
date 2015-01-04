@@ -25,4 +25,8 @@ public interface Node {
     void addChild(Node node);
 
     void removeChild(Node node);
+
+    void setEnabled(boolean enabled);
+
+    boolean isEnabled();
 }

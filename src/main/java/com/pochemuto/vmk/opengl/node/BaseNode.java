@@ -22,6 +22,8 @@ public abstract class BaseNode implements Node {
 
     private String name;
 
+    private boolean enabled = true;
+
     @Override
     @XmlAttribute
     public String getName() {
@@ -64,5 +66,15 @@ public abstract class BaseNode implements Node {
     @Override
     public void removeChild(Node node) {
         children.remove(node);
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

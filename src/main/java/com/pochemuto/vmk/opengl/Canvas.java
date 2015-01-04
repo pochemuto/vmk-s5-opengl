@@ -56,15 +56,8 @@ public class Canvas extends GLCanvas implements GLEventListener {
                 for (int i = 0; i < obj.getSurfaces().size(); i++) {
                     Material material = obj.getMaterial(i);
                     String texFile = material.getTexture();
-                    if (texFile != null) {
+                    if (texFile != null && !textures.containsKey(texFile)) {
                         try {
-//                            int[] ids = new int[1];
-//                            gl.glGenTextures(1, ids, 0);
-//                            int textureId = ids[0];
-//                            gl.glBindTexture(GL.GL_TEXTURE_2D, textureId);
-//                            Buffer image = ByteBuffer.wrap(Files.readAllBytes(Paths.get("/Users/pochemuto/Documents/workspace/opengl/src/main/resources/bricks.png")));
-//                            gl.glTexImage2D(textureId, 0, GL.GL_RGBA, 256, 256, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, image);
-//                            textures.put(texFile, textureId);
                             Texture texture = TextureIO.newTexture(new File("/Users/pochemuto/Documents/workspace/opengl/src/main/resources/bricks.png"), true);
                             textures.put(texFile, texture);
                             System.out.println("loaded " + texFile);
@@ -146,6 +139,10 @@ public class Canvas extends GLCanvas implements GLEventListener {
     }
 
     private void renderNodeTree(Node node, GL2 gl) {
+        if (!node.isEnabled()) {
+            return;
+        }
+
         gl.glPushMatrix();
         gl.glMultMatrixf(node.getTransform().getData(), 0);
 
@@ -203,7 +200,6 @@ public class Canvas extends GLCanvas implements GLEventListener {
 
         for (Surface surface : obj.getSurfaces()) {
             Material material = obj.getMaterial(s++);
-            //TODO материал
             gl.glColor3fv(material.getColor().getComponents(color), 0);
             gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, material.getDiffuse().getComponents(color), 0);
 
@@ -211,21 +207,13 @@ public class Canvas extends GLCanvas implements GLEventListener {
             String textureFile = material.getTexture();
             try {
                 if (textureFile != null && texcoords != null) {
-                    Texture textureId = textures.get(textureFile);
-                    if (textureId == null) {
+                    Texture texture = textures.get(textureFile);
+                    if (texture == null) {
                         System.err.println("текстура " + textureFile + " не загружена");
                     } else {
-//                        gl.glEnable(GL.GL_TEXTURE_2D);
-//                        gl.glBindTexture(GL.GL_TEXTURE_2D, textureId);
-                        textureId.enable(gl);
-                        textureId.bind(gl);
+                        texture.enable(gl);
+                        texture.bind(gl);
                     }
-//                    Texture texture = TextureIO.newTexture(textureFile, true, TextureIO.TGA);
-//                    Texture texture = TextureIO.newTexture(getClass().getResourceAsStream("/bricks.png"), false, TextureIO.PNG);
-//                    texture.bind(gl);
-//                    texture.enable(gl);
-
-//                    System.out.println("загружена текстура " + textureFile + " (" + texture.getImageWidth() + "x" + texture.getImageHeight());
                 }
             } catch (GLException e) {
                 System.err.println("ошибка при загрузке текстуры " + textureFile);
