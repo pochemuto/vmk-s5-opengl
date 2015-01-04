@@ -2,7 +2,6 @@ package com.pochemuto.vmk.opengl.material;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.awt.*;
-import java.net.URL;
 
 /**
  * @author pochemuto
@@ -13,7 +12,7 @@ public class Material {
 
     private Color diffuse = Color.WHITE;
 
-    private URL texture;
+    private String texture;
 
     public Color getColor() {
         return color;
@@ -31,11 +30,11 @@ public class Material {
         this.diffuse = diffuse;
     }
 
-    public URL getTexture() {
+    public String getTexture() {
         return texture;
     }
 
-    public void setTexture(URL texture) {
+    public void setTexture(String texture) {
         this.texture = texture;
     }
 }

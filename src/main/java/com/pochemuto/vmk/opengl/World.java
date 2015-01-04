@@ -50,4 +50,22 @@ public class World {
         }
         return null;
     }
+
+    public void recursive(NodeVisitor visitor) {
+        for (Node node : nodes) {
+            recursive(visitor, node);
+        }
+    }
+
+    private void recursive(NodeVisitor visitor, Node node) {
+        visitor.visit(node);
+        for (Node child : node.getChildren()) {
+            recursive(visitor, child);
+        }
+    }
+
+    public static interface NodeVisitor {
+        void visit(Node node);
+    }
 }
+

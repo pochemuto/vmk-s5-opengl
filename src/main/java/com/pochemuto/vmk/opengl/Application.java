@@ -139,7 +139,7 @@ public class Application {
         pivot.setName("pivot");
         ObjectNode box = new ObjectNode(Meshes.BOX6);
         Material sideMaterial = new Material();
-        sideMaterial.setTexture(Application.class.getResource("/bricks.png"));
+        sideMaterial.setTexture("/bricks.tga");
         box.setTransform(Mat4.scale(1, 0.8f, 1));
         box.setName("box");
         box.setMaterial(sideMaterial, 0);

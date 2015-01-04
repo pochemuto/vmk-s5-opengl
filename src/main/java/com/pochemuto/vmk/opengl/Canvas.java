@@ -16,8 +16,10 @@ import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
+import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author pochemuto
@@ -27,6 +29,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
     private GLU glu;
     private Updater updater;
     private int lights = 0;
+    private final Map<String, Texture> textures = new HashMap<>();
 
     public Canvas() throws GLException {
         addGLEventListener(this);
@@ -45,8 +48,33 @@ public class Canvas extends GLCanvas implements GLEventListener {
         gl.glClearDepth(1.0f);
         gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glDepthFunc(GL2.GL_LEQUAL);
-
         gl.glEnable(GL2.GL_LIGHTING);
+
+        world.recursive(node -> {
+            if (node instanceof Object) {
+                Object obj = (Object) node;
+                for (int i = 0; i < obj.getSurfaces().size(); i++) {
+                    Material material = obj.getMaterial(i);
+                    String texFile = material.getTexture();
+                    if (texFile != null) {
+                        try {
+//                            int[] ids = new int[1];
+//                            gl.glGenTextures(1, ids, 0);
+//                            int textureId = ids[0];
+//                            gl.glBindTexture(GL.GL_TEXTURE_2D, textureId);
+//                            Buffer image = ByteBuffer.wrap(Files.readAllBytes(Paths.get("/Users/pochemuto/Documents/workspace/opengl/src/main/resources/bricks.png")));
+//                            gl.glTexImage2D(textureId, 0, GL.GL_RGBA, 256, 256, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, image);
+//                            textures.put(texFile, textureId);
+                            Texture texture = TextureIO.newTexture(new File("/Users/pochemuto/Documents/workspace/opengl/src/main/resources/bricks.png"), true);
+                            textures.put(texFile, texture);
+                            System.out.println("loaded " + texFile);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -166,14 +194,13 @@ public class Canvas extends GLCanvas implements GLEventListener {
     }
 
     private static float[] vec3Array(Vec3 vec) {
-        return new float[] {vec.x(), vec.y(), vec.z()};
+        return new float[]{vec.x(), vec.y(), vec.z()};
     }
 
     private void renderObject(Object obj, GL2 gl) {
         int s = 0;
         float[] color = new float[4];
 
-        gl.glBegin(GL2.GL_TRIANGLES);
         for (Surface surface : obj.getSurfaces()) {
             Material material = obj.getMaterial(s++);
             //TODO материал
@@ -181,21 +208,32 @@ public class Canvas extends GLCanvas implements GLEventListener {
             gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, material.getDiffuse().getComponents(color), 0);
 
             float[] texcoords = surface.getTexcoords();
-            URL textureFile = material.getTexture();
+            String textureFile = material.getTexture();
             try {
                 if (textureFile != null && texcoords != null) {
-                    Texture texture = TextureIO.newTexture(textureFile, true, null);
-                    texture.bind(gl);
-                    texture.enable(gl);
-                    gl.glEnable(GL.GL_TEXTURE_2D);
-                    System.out.println("загружена текстура " + textureFile + " (" + texture.getImageWidth() + "x" + texture.getImageHeight());
+                    Texture textureId = textures.get(textureFile);
+                    if (textureId == null) {
+                        System.err.println("текстура " + textureFile + " не загружена");
+                    } else {
+//                        gl.glEnable(GL.GL_TEXTURE_2D);
+//                        gl.glBindTexture(GL.GL_TEXTURE_2D, textureId);
+                        textureId.enable(gl);
+                        textureId.bind(gl);
+                    }
+//                    Texture texture = TextureIO.newTexture(textureFile, true, TextureIO.TGA);
+//                    Texture texture = TextureIO.newTexture(getClass().getResourceAsStream("/bricks.png"), false, TextureIO.PNG);
+//                    texture.bind(gl);
+//                    texture.enable(gl);
+
+//                    System.out.println("загружена текстура " + textureFile + " (" + texture.getImageWidth() + "x" + texture.getImageHeight());
                 }
-            } catch (IOException|GLException e) {
+            } catch (GLException e) {
                 System.err.println("ошибка при загрузке текстуры " + textureFile);
                 e.printStackTrace();
             }
 
 
+            gl.glBegin(GL2.GL_TRIANGLES);
             float[] vertexes = surface.getVertexes();
             float[] normals = surface.getNormals();
             int[] polygons = surface.getPolygons();
@@ -207,8 +245,8 @@ public class Canvas extends GLCanvas implements GLEventListener {
             }
 
             gl.glDisable(GL2.GL_TEXTURE_2D);
+            gl.glEnd();
         }
-        gl.glEnd();
     }
 
     private void addVertex(float[] vertexes, int v, float[] normals, float[] texcoords, int n, GL2 gl) {
