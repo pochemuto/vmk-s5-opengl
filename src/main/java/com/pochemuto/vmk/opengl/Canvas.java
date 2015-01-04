@@ -206,7 +206,11 @@ public class Canvas extends GLCanvas implements GLEventListener {
         for (Surface surface : obj.getSurfaces()) {
             Material material = obj.getMaterial(s++);
             gl.glColor3fv(material.getColor().getComponents(color), 0);
+            gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, material.getAmbient().getComponents(color), 0);
             gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, material.getDiffuse().getComponents(color), 0);
+            gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, material.getSpecular().getComponents(color), 0);
+            gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_EMISSION, material.getEmission().getComponents(color), 0);
+            gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL2.GL_SHININESS, material.getShininess());
 
             float[] texcoords = surface.getTexcoords();
             String textureFile = material.getTexture();

@@ -173,12 +173,15 @@ public class Application {
 
         // свет
         Spot light = new Spot();
-        light.setConstantAttenuation(0);
-        light.setLinearAttenuation(0.2f);
-        light.setQuadraticAttenuation(0.4f);
+        light.setConstantAttenuation(2);
+        light.setLinearAttenuation(1.2f);
+        light.setCutoff(1);
+        light.setExponent(10);
+        light.setQuadraticAttenuation(1.4f);
         light.setDiffuse(new Color(223, 219, 255));
+        light.setAmbient(new Color(0,0,0,255));
 
-        light.setTransform(Mat4.rotateY(30));
+        light.setTransform(Mat4.translate(-100, -100, 10));
 
         world.getNodes().add(light);
         world.getNodes().add(p);
